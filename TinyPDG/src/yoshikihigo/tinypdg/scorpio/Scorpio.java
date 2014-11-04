@@ -336,23 +336,26 @@ public class Scorpio {
 							pdgpairs.add(new PDGPairInfo(pdgArray[i],
 									pdgArray[j]));
 						} else {
-							Message.log("\t\tignore the PDG pair \"" + pdg1.unit.name + " in "
-									+ pdg1.unit.path + "\" and \""
-									+ pdg2.unit.name + " in " + pdg2.unit.path
-									+ "\"");
+							// Message.log("\t\tignore the PDG pair \"" +
+							// pdg1.unit.name + " in "
+							// + pdg1.unit.path + "\" and \""
+							// + pdg2.unit.name + " in " + pdg2.unit.path
+							// + "\"");
 							numIgnored++;
 						}
 					}
 				}
-				Message.log("\tdone: the number of ignored PDG pairs is " + numIgnored);
-				
+				Message.log("\tdone: the number of ignored PDG pairs is "
+						+ numIgnored);
+
 				final PDGPairInfo[] pdgpairArray = pdgpairs
 						.toArray(new PDGPairInfo[0]);
 				final Thread[] slicingThreads = new Thread[NUMBER_OF_THREADS];
 				for (int i = 0; i < slicingThreads.length; i++) {
 					slicingThreads[i] = new Thread(new SlicingThread(
 							pdgpairArray, pdgArray, mappingPDGToPDGNodes,
-							mappingPDGToPDGEdges, clonepairs, SIZE_THRESHOLD));
+							mappingPDGToPDGEdges, clonepairs, SIZE_THRESHOLD,
+							crossProjectOnly));
 					slicingThreads[i].start();
 				}
 				for (final Thread thread : slicingThreads) {
@@ -362,6 +365,9 @@ public class Scorpio {
 						e.printStackTrace();
 					}
 				}
+				
+				System.out.println(pdgpairArray.length);
+				System.out.println(pdgArray.length);
 			}
 			System.out.print("done: ");
 			final long time4 = System.nanoTime();
