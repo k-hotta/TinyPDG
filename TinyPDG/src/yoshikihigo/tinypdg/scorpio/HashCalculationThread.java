@@ -38,6 +38,10 @@ public class HashCalculationThread implements Runnable {
 
 			final PDG pdg = this.pdgs[index];
 
+			Message.log("\t[" + index + "/" + this.pdgs.length
+					+ "] processing the pdg of method " + pdg.unit.name
+					+ " in " + pdg.unit.path);
+
 			try {
 
 				final SortedMap<PDGNode<?>, Integer> mappingPDGNodeToHash = new TreeMap<PDGNode<?>, Integer>();

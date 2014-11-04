@@ -46,6 +46,15 @@ public class Scorpio {
 			}
 
 			{
+				final Option ad = new Option("ad", "another-directory", true,
+						"another target directory");
+				ad.setArgName("another-directory");
+				ad.setArgs(1);
+				ad.setRequired(true);
+				options.addOption(ad);
+			}
+
+			{
 				final Option o = new Option("o", "output", true, "output file");
 				o.setArgName("file");
 				o.setArgs(1);
@@ -68,6 +77,22 @@ public class Scorpio {
 				t.setArgs(1);
 				t.setRequired(false);
 				options.addOption(t);
+			}
+
+			{
+				final Option cross = new Option("cross", "cross-project-only",
+						true, "whether to detect cross project clones only");
+				cross.setArgName("on or off");
+				cross.setRequired(false);
+				options.addOption(cross);
+			}
+
+			{
+				final Option v = new Option("v", "verbose", true,
+						"verbose output");
+				v.setArgName("on or off");
+				v.setRequired(false);
+				options.addOption(v);
 			}
 
 			{
@@ -174,13 +199,65 @@ public class Scorpio {
 				useOfMerging = false;
 			}
 
+			boolean crossProjectOnly = false;
+			if (cmd.hasOption("cross")) {
+				if (cmd.getOptionValue("cross").equals("on")) {
+					crossProjectOnly = true;
+				} else if (cmd.getOptionValue("cross").equals("off")) {
+					crossProjectOnly = false;
+				} else {
+					System.err
+							.println("option of \"-cross\" must be \"on\" or \"off\".");
+				}
+			}
+
+			// default verbose level is "off"
+			if (cmd.hasOption("v")) {
+				if (cmd.getOptionValue("v").equals("on")) {
+					Message.setVerbose(true);
+				} else if (cmd.getOptionValue("v").equals("off")) {
+					Message.setVerbose(false);
+				} else {
+					System.err
+							.println("option of \"-v\" must be \"on\" or \"off\".");
+				}
+			}
+
+			File anotherTarget = null;
+			if (cmd.hasOption("ad")) {
+				anotherTarget = new File(cmd.getOptionValue("ad"));
+				if (!anotherTarget.exists()) {
+					System.err
+							.println("specified directory or file does not exist.");
+					System.exit(0);
+				}
+			}
+
+			if (crossProjectOnly && anotherTarget == null) {
+				System.err
+						.println("detecting cross project only is ON, but no second directory or file has been specified");
+				System.exit(0);
+			}
+
 			final long time1 = System.nanoTime();
 			System.out.print("generating PDGs ... ");
+			Message.log("");
 			final PDG[] pdgArray;
 			{
 				final List<File> files = getFiles(target);
+
+				if (anotherTarget != null) {
+					files.addAll(getFiles(anotherTarget));
+				}
+
+				int count = 0;
+				final int numOfFiles = files.size();
+
 				final List<MethodInfo> methods = new ArrayList<MethodInfo>();
 				for (final File file : files) {
+					Message.log("\t[" + (++count) + "/" + numOfFiles
+							+ "] building an AST for " + file.getAbsolutePath());
+
 					final CompilationUnit unit = TinyPDGASTVisitor
 							.createAST(file);
 					final TinyPDGASTVisitor visitor = new TinyPDGASTVisitor(
@@ -215,6 +292,7 @@ public class Scorpio {
 			printTime(time2 - time1);
 
 			System.out.print("calculating hash values ... ");
+			Message.log("");
 			final SortedMap<PDG, SortedMap<PDGNode<?>, Integer>> mappingPDGToPDGNodes = Collections
 					.synchronizedSortedMap(new TreeMap<PDG, SortedMap<PDGNode<?>, Integer>>());
 			final SortedMap<PDG, SortedMap<PDGEdge, Integer>> mappingPDGToPDGEdges = Collections
@@ -240,15 +318,34 @@ public class Scorpio {
 			printTime(time3 - time2);
 
 			System.out.print("detecting clone pairs ... ");
+			Message.log("");
 			final SortedSet<ClonePairInfo> clonepairs = Collections
 					.synchronizedSortedSet(new TreeSet<ClonePairInfo>());
 			{
+				int numIgnored = 0;
 				final List<PDGPairInfo> pdgpairs = new ArrayList<PDGPairInfo>();
+				Message.log("\tmaking PDG pairs ... ");
 				for (int i = 0; i < pdgArray.length; i++) {
 					for (int j = i + 1; j < pdgArray.length; j++) {
-						pdgpairs.add(new PDGPairInfo(pdgArray[i], pdgArray[j]));
+						final PDG pdg1 = pdgArray[i];
+						final PDG pdg2 = pdgArray[j];
+
+						if (!crossProjectOnly
+								|| isCrossProject(pdg1, pdg2, target,
+										anotherTarget)) {
+							pdgpairs.add(new PDGPairInfo(pdgArray[i],
+									pdgArray[j]));
+						} else {
+							Message.log("\t\tignore the PDG pair \"" + pdg1.unit.name + " in "
+									+ pdg1.unit.path + "\" and \""
+									+ pdg2.unit.name + " in " + pdg2.unit.path
+									+ "\"");
+							numIgnored++;
+						}
 					}
 				}
+				Message.log("\tdone: the number of ignored PDG pairs is " + numIgnored);
+				
 				final PDGPairInfo[] pdgpairArray = pdgpairs
 						.toArray(new PDGPairInfo[0]);
 				final Thread[] slicingThreads = new Thread[NUMBER_OF_THREADS];
@@ -356,4 +453,18 @@ public class Scorpio {
 			System.out.println(" second.");
 		}
 	}
+
+	private static boolean isCrossProject(final PDG pdg1, final PDG pdg2,
+			final File root1, final File root2) {
+		final String rootPath1 = root1.getAbsolutePath();
+		final String rootPath2 = root2.getAbsolutePath();
+
+		final boolean check1 = pdg1.unit.path.startsWith(rootPath1)
+				&& pdg2.unit.path.startsWith(rootPath2);
+		final boolean check2 = pdg1.unit.path.startsWith(rootPath2)
+				&& pdg2.unit.path.startsWith(rootPath1);
+
+		return check1 || check2;
+	}
+
 }

@@ -64,6 +64,10 @@ public class SlicingThread implements Runnable {
 			final String pathA = pdgA.unit.path;
 			final String pathB = pdgB.unit.path;
 
+			Message.log("\t\t[" + index + "/" + this.pdgpairs.length
+					+ "] slicing \"" + pdgA.unit.name + " in " + pathA
+					+ "\" and \"" + pdgB.unit.name + " in " + pathB + "\"");
+
 			try {
 
 				final SortedMap<PDGNode<?>, Integer> mappingPDGNodeToHashA = this.mapPDGToPDGNodes

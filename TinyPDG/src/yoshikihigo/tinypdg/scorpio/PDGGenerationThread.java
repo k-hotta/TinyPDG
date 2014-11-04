@@ -23,6 +23,7 @@ public class PDGGenerationThread implements Runnable {
 	final private boolean useOfExecution;
 	final private boolean useOfMerging;
 	final private int threshold;
+	final private int numOfMethods;
 
 	public PDGGenerationThread(final List<MethodInfo> methods,
 			final SortedSet<PDG> pdgs, final CFGNodeFactory cfgNodeFactory,
@@ -42,6 +43,7 @@ public class PDGGenerationThread implements Runnable {
 		this.useOfExecution = useOfExecution;
 		this.useOfMerging = useOfMerging;
 		this.threshold = threshold;
+		this.numOfMethods = methods.size();
 	}
 
 	@Override
@@ -49,6 +51,10 @@ public class PDGGenerationThread implements Runnable {
 		for (int index = INDEX.getAndIncrement(); index < this.methods.size(); index = INDEX
 				.getAndIncrement()) {
 			final MethodInfo method = this.methods.get(index);
+
+			Message.log("\t[" + index + "/" + numOfMethods
+					+ "] building a PDG for " + method.name + " in "
+					+ method.path);
 
 			try {
 
