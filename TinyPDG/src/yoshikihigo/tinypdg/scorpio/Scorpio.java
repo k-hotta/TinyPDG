@@ -50,7 +50,7 @@ public class Scorpio {
 						"another target directory");
 				ad.setArgName("another-directory");
 				ad.setArgs(1);
-				ad.setRequired(true);
+				ad.setRequired(false);
 				options.addOption(ad);
 			}
 
