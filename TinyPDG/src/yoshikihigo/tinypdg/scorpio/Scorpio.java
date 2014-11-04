@@ -365,9 +365,6 @@ public class Scorpio {
 						e.printStackTrace();
 					}
 				}
-				
-				System.out.println(pdgpairArray.length);
-				System.out.println(pdgArray.length);
 			}
 			System.out.print("done: ");
 			final long time4 = System.nanoTime();

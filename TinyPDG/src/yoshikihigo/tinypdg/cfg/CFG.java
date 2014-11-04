@@ -465,8 +465,14 @@ public class CFG {
 			}
 		}
 
-		this.exitNodes
-				.addAll(sequentialCFGs.get(sequentialCFGs.size() - 1).exitNodes);
+		if (0 == sequentialCFGs.size()) {
+			// special treat for the case where the switch statement has no
+			// sub-statements
+			this.exitNodes.add(conditionNode);
+		} else {
+			this.exitNodes
+					.addAll(sequentialCFGs.get(sequentialCFGs.size() - 1).exitNodes);
+		}
 
 		this.connectCFGBreakStatementNode(statement);
 	}
