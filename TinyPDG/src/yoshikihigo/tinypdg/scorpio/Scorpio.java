@@ -88,6 +88,14 @@ public class Scorpio {
 			}
 
 			{
+				final Option offset = new Option("offset", "offset", true,
+						"whether using offset of texts");
+				offset.setArgName("on or off");
+				offset.setRequired(false);
+				options.addOption(offset);
+			}
+
+			{
 				final Option v = new Option("v", "verbose", true,
 						"verbose output");
 				v.setArgName("on or off");
@@ -208,6 +216,18 @@ public class Scorpio {
 				} else {
 					System.err
 							.println("option of \"-cross\" must be \"on\" or \"off\".");
+				}
+			}
+
+			boolean useOffset = false;
+			if (cmd.hasOption("offset")) {
+				if (cmd.getOptionValue("offset").equals("on")) {
+					useOffset = true;
+				} else if (cmd.getOptionValue("offset").equals("off")) {
+					useOffset = false;
+				} else {
+					System.err
+							.println("option of \"-offset\" must be \"on\" or \"off\"");
 				}
 			}
 
