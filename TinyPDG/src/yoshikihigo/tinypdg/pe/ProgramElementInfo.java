@@ -13,6 +13,8 @@ abstract public class ProgramElementInfo implements
 
 	final public int startLine;
 	final public int endLine;
+	final public int startOffset;
+	final public int endOffset;
 	final public int id;
 	private String text;
 
@@ -20,9 +22,12 @@ abstract public class ProgramElementInfo implements
 
 	protected BlockInfo ownerConditionalBlock;
 
-	public ProgramElementInfo(final int startLine, final int endLine) {
+	public ProgramElementInfo(final int startLine, final int endLine,
+			final int startOffset, final int endOffset) {
 		this.startLine = startLine;
 		this.endLine = endLine;
+		this.startOffset = startOffset;
+		this.endOffset = endOffset;
 		this.id = ID_GENERATOR.getAndIncrement();
 		this.text = "";
 

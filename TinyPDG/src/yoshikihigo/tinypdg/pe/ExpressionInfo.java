@@ -13,8 +13,8 @@ public class ExpressionInfo extends ProgramElementInfo {
 	private ClassInfo anonymousClassDeclaration;
 
 	public ExpressionInfo(final CATEGORY category, final int startLine,
-			final int endLine) {
-		super(startLine, endLine);
+			final int endLine, final int startOffset, final int endOffset) {
+		super(startLine, endLine, startOffset, endOffset);
 		this.category = category;
 		this.qualifier = null;
 		this.expressions = new ArrayList<ProgramElementInfo>();

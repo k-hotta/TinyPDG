@@ -25,9 +25,10 @@ public class StatementInfo extends ProgramElementInfo implements BlockInfo {
 	private String label;
 
 	public StatementInfo(final ProgramElementInfo ownerBlock,
-			final CATEGORY category, final int startLine, final int endLine) {
+			final CATEGORY category, final int startLine, final int endLine,
+			final int startOffset, final int endOffset) {
 
-		super(startLine, endLine);
+		super(startLine, endLine, startOffset, endOffset);
 
 		this.ownerBlock = ownerBlock;
 		this.category = category;

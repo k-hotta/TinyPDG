@@ -63,6 +63,7 @@ import org.eclipse.jdt.core.dom.SynchronizedStatement;
 import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 import org.eclipse.jdt.core.dom.TypeLiteral;
@@ -131,8 +132,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ClassInfo typeDeclaration = new ClassInfo(this.path, node
-				.getName().toString(), startLine, endLine);
+				.getName().toString(), startLine, endLine, startOffset,
+				endOffset);
 		this.stack.push(typeDeclaration);
 
 		final StringBuilder text = new StringBuilder();
@@ -163,9 +167,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo statement = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.TypeDeclaration, startLine, endLine);
+					StatementInfo.CATEGORY.TypeDeclaration, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(statement);
 
 			node.getDeclaration().accept(this);
@@ -198,8 +205,10 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ClassInfo anonymousClass = new ClassInfo(this.path, null,
-				startLine, endLine);
+				startLine, endLine, startOffset, endOffset);
 		this.stack.push(anonymousClass);
 
 		for (final Object o : node.bodyDeclarations()) {
@@ -222,9 +231,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final String name = node.getName().getIdentifier();
 		final MethodInfo method = new MethodInfo(this.path, name, startLine,
-				endLine);
+				endLine, startOffset, endOffset);
 		this.stack.push(method);
 
 		final StringBuilder text = new StringBuilder();
@@ -262,6 +273,22 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		method.setText(text.toString());
 
 		return false;
+	}
+
+	private int getStartOffset(final ASTNode node) {
+		if (node == null) {
+			return -1;
+		} else {
+			return node.getStartPosition();
+		}
+	}
+
+	private int getEndOffset(final ASTNode node) {
+		if (node == null) {
+			return -1;
+		} else {
+			return node.getStartPosition() + node.getLength() - 1;
+		}
 	}
 
 	private int getStartLineNumber(final ASTNode node) {
@@ -315,9 +342,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo statement = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Assert, startLine, endLine);
+					StatementInfo.CATEGORY.Assert, startLine, endLine,
+					startOffset, endOffset);
 			statement.addExpression(expression);
 			statement.addExpression(message);
 			this.stack.push(statement);
@@ -331,8 +361,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo expression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.ArrayAccess, startLine, endLine);
+				ExpressionInfo.CATEGORY.ArrayAccess, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(expression);
 
 		node.getArray().accept(this);
@@ -363,7 +396,10 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		}
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
-		final TypeInfo type = new TypeInfo(text.toString(), startLine, endLine);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
+		final TypeInfo type = new TypeInfo(text.toString(), startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(type);
 
 		return false;
@@ -374,8 +410,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ProgramElementInfo expression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Null, startLine, endLine);
+				ExpressionInfo.CATEGORY.Null, startLine, endLine, startOffset,
+				endOffset);
 		expression.setText("null");
 		this.stack.push(expression);
 
@@ -387,8 +426,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ProgramElementInfo expression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Number, startLine, endLine);
+				ExpressionInfo.CATEGORY.Number, startLine, endLine,
+				startOffset, endOffset);
 		expression.setText(node.getToken());
 		this.stack.push(expression);
 
@@ -400,16 +442,21 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo postfixExpression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Postfix, startLine, endLine);
+				ExpressionInfo.CATEGORY.Postfix, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(postfixExpression);
 
 		node.getOperand().accept(this);
 		final ProgramElementInfo operand = this.stack.pop();
 		postfixExpression.addExpression((ProgramElementInfo) operand);
 
+		node.getOperator();
+
 		final OperatorInfo operator = new OperatorInfo(node.getOperator()
-				.toString(), startLine, endLine);
+				.toString(), startLine, endLine, -1, -1);
 		postfixExpression.addExpression(operator);
 
 		final StringBuilder text = new StringBuilder();
@@ -425,12 +472,15 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo prefixExpression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Prefix, startLine, endLine);
+				ExpressionInfo.CATEGORY.Prefix, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(prefixExpression);
 
 		final OperatorInfo operator = new OperatorInfo(node.getOperator()
-				.toString(), startLine, endLine);
+				.toString(), startLine, endLine, -1, -1);
 		prefixExpression.addExpression(operator);
 
 		node.getOperand().accept(this);
@@ -450,8 +500,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ProgramElementInfo expression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.String, startLine, endLine);
+				ExpressionInfo.CATEGORY.String, startLine, endLine,
+				startOffset, endOffset);
 		expression.setText("\"" + node.getLiteralValue() + "\"");
 		this.stack.push(expression);
 
@@ -463,8 +516,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo superFieldAccess = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.SuperFieldAccess, startLine, endLine);
+				ExpressionInfo.CATEGORY.SuperFieldAccess, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(superFieldAccess);
 
 		node.getName().accept(this);
@@ -484,9 +540,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo superMethodInvocation = new ExpressionInfo(
 				ExpressionInfo.CATEGORY.SuperMethodInvocation, startLine,
-				endLine);
+				endLine, startOffset, endOffset);
 		this.stack.push(superMethodInvocation);
 
 		node.getName().accept(this);
@@ -512,8 +570,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ProgramElementInfo expression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.TypeLiteral, startLine, endLine);
+				ExpressionInfo.CATEGORY.TypeLiteral, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(expression);
 
 		return false;
@@ -524,8 +585,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo qualifiedName = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.QualifiedName, startLine, endLine);
+				ExpressionInfo.CATEGORY.QualifiedName, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(qualifiedName);
 
 		node.getQualifier().accept(this);
@@ -550,8 +614,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ProgramElementInfo simpleName = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.SimpleName, startLine, endLine);
+				ExpressionInfo.CATEGORY.SimpleName, startLine, endLine,
+				startOffset, endOffset);
 		simpleName.setText(node.getIdentifier());
 		this.stack.push(simpleName);
 
@@ -563,8 +630,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ProgramElementInfo expression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Character, startLine, endLine);
+				ExpressionInfo.CATEGORY.Character, startLine, endLine,
+				startOffset, endOffset);
 		expression.setText("\'" + node.charValue() + "\'");
 		this.stack.push(expression);
 
@@ -576,8 +646,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo fieldAccess = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.FieldAccess, startLine, endLine);
+				ExpressionInfo.CATEGORY.FieldAccess, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(fieldAccess);
 
 		node.getExpression().accept(this);
@@ -602,8 +675,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo infixExpression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Infix, startLine, endLine);
+				ExpressionInfo.CATEGORY.Infix, startLine, endLine, startOffset,
+				endOffset);
 		this.stack.push(infixExpression);
 
 		node.getLeftOperand().accept(this);
@@ -611,7 +687,7 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		infixExpression.addExpression(left);
 
 		final OperatorInfo operator = new OperatorInfo(node.getOperator()
-				.toString(), startLine, endLine);
+				.toString(), startLine, endLine, -1, -1);
 		infixExpression.addExpression(operator);
 
 		node.getRightOperand().accept(this);
@@ -648,8 +724,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo arrayCreation = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.ArrayCreation, startLine, endLine);
+				ExpressionInfo.CATEGORY.ArrayCreation, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(arrayCreation);
 
 		node.getType().accept(this);
@@ -677,8 +756,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo initializer = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.ArrayInitializer, startLine, endLine);
+				ExpressionInfo.CATEGORY.ArrayInitializer, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(initializer);
 
 		final StringBuilder text = new StringBuilder();
@@ -704,8 +786,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ProgramElementInfo expression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Boolean, startLine, endLine);
+				ExpressionInfo.CATEGORY.Boolean, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(expression);
 		expression.setText(node.toString());
 
@@ -717,8 +802,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo assignment = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Assignment, startLine, endLine);
+				ExpressionInfo.CATEGORY.Assignment, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(assignment);
 
 		node.getLeftHandSide().accept(this);
@@ -726,7 +814,7 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		assignment.addExpression(left);
 
 		final OperatorInfo operator = new OperatorInfo(node.getOperator()
-				.toString(), startLine, endLine);
+				.toString(), startLine, endLine, -1, -1);
 		assignment.addExpression(operator);
 
 		node.getRightHandSide().accept(this);
@@ -749,12 +837,18 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo cast = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Cast, startLine, endLine);
+				ExpressionInfo.CATEGORY.Cast, startLine, endLine, startOffset,
+				endOffset);
 		this.stack.push(cast);
 
+		final Type typeNode = node.getType();
+		final int typeStartOffset = this.getStartOffset(typeNode);
+		final int typeEndOffset = this.getEndOffset(typeNode);
 		final TypeInfo type = new TypeInfo(node.getType().toString(),
-				startLine, endLine);
+				startLine, endLine, typeStartOffset, typeEndOffset);
 		cast.addExpression(type);
 
 		node.getExpression().accept(this);
@@ -776,13 +870,18 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo classInstanceCreation = new ExpressionInfo(
 				ExpressionInfo.CATEGORY.ClassInstanceCreation, startLine,
-				endLine);
+				endLine, startOffset, endOffset);
 		this.stack.push(classInstanceCreation);
 
+		final Type typeNode = node.getType();
+		final int typeStartOffset = this.getStartOffset(typeNode);
+		final int typeEndOffset = this.getEndOffset(typeNode);
 		final TypeInfo type = new TypeInfo(node.getType().toString(),
-				startLine, endLine);
+				startLine, endLine, typeStartOffset, typeEndOffset);
 		classInstanceCreation.addExpression(type);
 
 		final StringBuilder text = new StringBuilder();
@@ -829,8 +928,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo trinomial = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Trinomial, startLine, endLine);
+				ExpressionInfo.CATEGORY.Trinomial, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(trinomial);
 
 		node.getExpression().accept(this);
@@ -861,9 +963,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo invocation = new ExpressionInfo(
 				ExpressionInfo.CATEGORY.ConstructorInvocation, startLine,
-				endLine);
+				endLine, startOffset, endOffset);
 		this.stack.push(invocation);
 
 		final StringBuilder text = new StringBuilder();
@@ -884,7 +988,8 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		this.stack.pop();
 		final ProgramElementInfo ownerBlock = this.stack.peek();
 		final StatementInfo statement = new StatementInfo(ownerBlock,
-				StatementInfo.CATEGORY.Expression, startLine, endLine);
+				StatementInfo.CATEGORY.Expression, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(statement);
 
 		statement.addExpression(invocation);
@@ -901,9 +1006,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo statement = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Expression, startLine, endLine);
+					StatementInfo.CATEGORY.Expression, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(statement);
 
 			node.getExpression().accept(this);
@@ -925,8 +1033,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo instanceofExpression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Instanceof, startLine, endLine);
+				ExpressionInfo.CATEGORY.Instanceof, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(instanceofExpression);
 
 		node.getLeftOperand().accept(this);
@@ -951,8 +1062,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo methodInvocation = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.MethodInvocation, startLine, endLine);
+				ExpressionInfo.CATEGORY.MethodInvocation, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(methodInvocation);
 
 		final StringBuilder text = new StringBuilder();
@@ -995,8 +1109,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo parenthesizedExpression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.Parenthesized, startLine, endLine);
+				ExpressionInfo.CATEGORY.Parenthesized, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(parenthesizedExpression);
 
 		node.getExpression().accept(this);
@@ -1019,9 +1136,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo returnStatement = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Return, startLine, endLine);
+					StatementInfo.CATEGORY.Return, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(returnStatement);
 
 			final StringBuilder text = new StringBuilder();
@@ -1047,9 +1167,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo superConstructorInvocation = new ExpressionInfo(
 				ExpressionInfo.CATEGORY.SuperConstructorInvocation, startLine,
-				endLine);
+				endLine, startOffset, endOffset);
 		this.stack.push(superConstructorInvocation);
 
 		final StringBuilder text = new StringBuilder();
@@ -1081,7 +1203,8 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		this.stack.pop();
 		final ProgramElementInfo ownerBlock = this.stack.peek();
 		final StatementInfo statement = new StatementInfo(ownerBlock,
-				StatementInfo.CATEGORY.Expression, startLine, endLine);
+				StatementInfo.CATEGORY.Expression, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(statement);
 
 		statement.addExpression(superConstructorInvocation);
@@ -1096,8 +1219,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ProgramElementInfo expression = new ExpressionInfo(
-				ExpressionInfo.CATEGORY.This, startLine, endLine);
+				ExpressionInfo.CATEGORY.This, startLine, endLine, startOffset,
+				endOffset);
 		this.stack.push(expression);
 		expression.setText("this");
 
@@ -1109,13 +1235,18 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo vdExpression = new ExpressionInfo(
 				ExpressionInfo.CATEGORY.VariableDeclarationExpression,
-				startLine, endLine);
+				startLine, endLine, startOffset, endOffset);
 		this.stack.push(vdExpression);
 
+		final Type typeNode = node.getType();
+		final int typeStartOffset = this.getStartOffset(typeNode);
+		final int typeEndOffset = this.getEndOffset(typeNode);
 		final TypeInfo type = new TypeInfo(node.getType().toString(),
-				startLine, endLine);
+				startLine, endLine, typeStartOffset, typeEndOffset);
 		vdExpression.addExpression(type);
 
 		final StringBuilder text = new StringBuilder();
@@ -1141,10 +1272,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo vdStatement = new StatementInfo(ownerBlock,
 					StatementInfo.CATEGORY.VariableDeclaration, startLine,
-					endLine);
+					endLine, startOffset, endOffset);
 			this.stack.push(vdStatement);
 
 			final StringBuilder text = new StringBuilder();
@@ -1153,8 +1286,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 				text.append(" ");
 			}
 
+			final Type typeNode = node.getType();
+			final int typeStartOffset = this.getStartOffset(typeNode);
+			final int typeEndOffset = this.getEndOffset(typeNode);
 			final ProgramElementInfo type = new TypeInfo(node.getType()
-					.toString(), startLine, endLine);
+					.toString(), startLine, endLine, typeStartOffset,
+					typeEndOffset);
 			vdStatement.addExpression(type);
 
 			text.append(node.getType().toString());
@@ -1172,7 +1309,7 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			if (anyExpression) {
 				text.deleteCharAt(text.length() - 1);
 			}
-			
+
 			text.append(";");
 			vdStatement.setText(text.toString());
 		}
@@ -1185,9 +1322,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
 		final ExpressionInfo vdFragment = new ExpressionInfo(
 				ExpressionInfo.CATEGORY.VariableDeclarationFragment, startLine,
-				endLine);
+				endLine, startOffset, endOffset);
 		this.stack.push(vdFragment);
 
 		node.getName().accept(this);
@@ -1218,9 +1357,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo doBlock = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Do, startLine, endLine);
+					StatementInfo.CATEGORY.Do, startLine, endLine, startOffset,
+					endOffset);
 			this.stack.push(doBlock);
 
 			node.getBody().accept(this);
@@ -1257,9 +1399,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo foreachBlock = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Foreach, startLine, endLine);
+					StatementInfo.CATEGORY.Foreach, startLine, endLine,
+					startOffset, endOffset);
 			foreachBlock.addInitializer(parameter);
 			foreachBlock.addInitializer(expression);
 			this.stack.push(foreachBlock);
@@ -1288,9 +1433,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo forBlock = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.For, startLine, endLine);
+					StatementInfo.CATEGORY.For, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(forBlock);
 
 			final StringBuilder text = new StringBuilder();
@@ -1352,9 +1500,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo ifBlock = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.If, startLine, endLine);
+					StatementInfo.CATEGORY.If, startLine, endLine, startOffset,
+					endOffset);
 			this.stack.push(ifBlock);
 
 			node.getExpression().accept(this);
@@ -1395,9 +1546,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo switchBlock = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Switch, startLine, endLine);
+					StatementInfo.CATEGORY.Switch, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(switchBlock);
 
 			node.getExpression().accept(this);
@@ -1434,10 +1588,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo synchronizedBlock = new StatementInfo(
 					ownerBlock, StatementInfo.CATEGORY.Synchronized, startLine,
-					endLine);
+					endLine, startOffset, endOffset);
 			this.stack.push(synchronizedBlock);
 
 			node.getExpression().accept(this);
@@ -1467,9 +1623,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		if (!this.stack.isEmpty() && this.stack.peek() instanceof BlockInfo) {
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo throwStatement = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Throw, startLine, endLine);
+					StatementInfo.CATEGORY.Throw, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(throwStatement);
 
 			node.getExpression().accept(this);
@@ -1494,9 +1653,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo tryBlock = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Try, startLine, endLine);
+					StatementInfo.CATEGORY.Try, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(tryBlock);
 
 			node.getBody().accept(this);
@@ -1536,9 +1698,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo whileBlock = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.While, startLine, endLine);
+					StatementInfo.CATEGORY.While, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(whileBlock);
 
 			node.getExpression().accept(this);
@@ -1568,9 +1733,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		if (!this.stack.isEmpty() && this.stack.peek() instanceof BlockInfo) {
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo switchCase = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Case, startLine, endLine);
+					StatementInfo.CATEGORY.Case, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(switchCase);
 
 			final StringBuilder text = new StringBuilder();
@@ -1600,9 +1768,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo breakStatement = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Break, startLine, endLine);
+					StatementInfo.CATEGORY.Break, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(breakStatement);
 
 			final StringBuilder text = new StringBuilder();
@@ -1631,10 +1802,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo continuekStatement = new StatementInfo(
 					ownerBlock, StatementInfo.CATEGORY.Continue, startLine,
-					endLine);
+					endLine, startOffset, endOffset);
 			this.stack.push(continuekStatement);
 
 			final StringBuilder text = new StringBuilder();
@@ -1675,9 +1848,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo simpleBlock = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.SimpleBlock, startLine, endLine);
+					StatementInfo.CATEGORY.SimpleBlock, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(simpleBlock);
 
 			final StringBuilder text = new StringBuilder();
@@ -1706,9 +1882,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo catchBlock = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Catch, startLine, endLine);
+					StatementInfo.CATEGORY.Catch, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(catchBlock);
 
 			node.getException().accept(this);
@@ -1736,11 +1915,18 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final int startLine = this.getStartLineNumber(node);
 		final int endLine = this.getEndLineNumber(node);
+		final int startOffset = this.getStartOffset(node);
+		final int endOffset = this.getEndOffset(node);
+
+		final Type typeNode = node.getType();
+		final int typeStartOffset = this.getStartOffset(typeNode);
+		final int typeEndOffset = this.getEndOffset(typeNode);
 		final TypeInfo type = new TypeInfo(node.getType().toString(),
-				startLine, endLine);
+				startLine, endLine, typeStartOffset, typeEndOffset);
 		final String name = node.getName().toString();
 		final VariableInfo variable = new VariableInfo(
-				VariableInfo.CATEGORY.LOCAL, type, name, startLine, endLine);
+				VariableInfo.CATEGORY.LOCAL, type, name, startLine, endLine,
+				startOffset, endOffset);
 		this.stack.push(variable);
 
 		final StringBuilder text = new StringBuilder();
@@ -1764,9 +1950,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 			final int startLine = this.getStartLineNumber(node);
 			final int endLine = this.getEndLineNumber(node);
+			final int startOffset = this.getStartOffset(node);
+			final int endOffset = this.getEndOffset(node);
 			final ProgramElementInfo ownerBlock = this.stack.peek();
 			final StatementInfo emptyStatement = new StatementInfo(ownerBlock,
-					StatementInfo.CATEGORY.Empty, startLine, endLine);
+					StatementInfo.CATEGORY.Empty, startLine, endLine,
+					startOffset, endOffset);
 			this.stack.push(emptyStatement);
 			emptyStatement.setText(";");
 		}

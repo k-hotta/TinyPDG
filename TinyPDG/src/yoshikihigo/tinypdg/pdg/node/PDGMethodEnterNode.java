@@ -10,7 +10,7 @@ public class PDGMethodEnterNode extends PDGControlNode {
 		assert null != method : "\"method\" is null.";
 		final ProgramElementInfo methodEnterExpression = new ExpressionInfo(
 				ExpressionInfo.CATEGORY.MethodEnter, method.startLine,
-				method.endLine);
+				method.endLine, method.startOffset, method.endOffset);
 		methodEnterExpression.setText("Enter");
 		return new PDGMethodEnterNode(methodEnterExpression);
 	}
