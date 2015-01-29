@@ -118,13 +118,15 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 	final private CompilationUnit root;
 	final private List<MethodInfo> methods;
 	final private Stack<ProgramElementInfo> stack;
+	final private boolean useOffset;
 
 	public TinyPDGASTVisitor(final String path, final CompilationUnit root,
-			final List<MethodInfo> methods) {
+			final List<MethodInfo> methods, final boolean useOffset) {
 		this.path = path;
 		this.root = root;
 		this.methods = methods;
 		this.stack = new Stack<ProgramElementInfo>();
+		this.useOffset = useOffset;
 	}
 
 	@Override
@@ -155,7 +157,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			}
 		}
 		text.append("}");
-		typeDeclaration.setText(text.toString());
+
+		if (useOffset) {
+			typeDeclaration.setText(null);
+		} else {
+			typeDeclaration.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -179,7 +186,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			final ProgramElementInfo typeDeclaration = this.stack.pop();
 			statement.addExpression(typeDeclaration);
 
-			statement.setText(typeDeclaration.getText());
+			if (useOffset) {
+				statement.setText(null);
+			} else {
+				statement.setText(typeDeclaration.getText());
+			}
 		}
 
 		return false;
@@ -221,7 +232,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		}
 
 		text.append("}");
-		anonymousClass.setText(text.toString());
+
+		if (useOffset) {
+			anonymousClass.setText(null);
+		} else {
+			anonymousClass.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -270,7 +286,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			method.setStatement((StatementInfo) body);
 			text.append(body.getText());
 		}
-		method.setText(text.toString());
+
+		if (useOffset) {
+			method.setText(null);
+		} else {
+			method.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -381,7 +402,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		text.append("[");
 		text.append(index.getText());
 		text.append("]");
-		expression.setText(text.toString());
+
+		if (useOffset) {
+			expression.setText(null);
+		} else {
+			expression.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -462,7 +488,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		final StringBuilder text = new StringBuilder();
 		text.append(operand.getText());
 		text.append(operator.getText());
-		postfixExpression.setText(text.toString());
+
+		if (useOffset) {
+			postfixExpression.setText(null);
+		} else {
+			postfixExpression.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -490,7 +521,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		final StringBuilder text = new StringBuilder();
 		text.append(operator.getText());
 		text.append(operand.getText());
-		prefixExpression.setText(text.toString());
+
+		if (useOffset) {
+			prefixExpression.setText(null);
+		} else {
+			prefixExpression.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -530,7 +566,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		final StringBuilder text = new StringBuilder();
 		text.append("super.");
 		text.append(name.getText());
-		superFieldAccess.setText(text.toString());
+
+		if (useOffset) {
+			superFieldAccess.setText(null);
+		} else {
+			superFieldAccess.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -560,7 +601,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			superMethodInvocation.addExpression(argumentExpression);
 			text.append(argumentExpression.getText());
 		}
-		superMethodInvocation.setText(text.toString());
+
+		if (useOffset) {
+			superMethodInvocation.setText(null);
+		} else {
+			superMethodInvocation.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -604,7 +650,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		text.append(qualifier.getText());
 		text.append(".");
 		text.append(name.getText());
-		qualifiedName.setText(text.toString());
+
+		if (useOffset) {
+			qualifiedName.setText(null);
+		} else {
+			qualifiedName.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -619,7 +670,13 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		final ProgramElementInfo simpleName = new ExpressionInfo(
 				ExpressionInfo.CATEGORY.SimpleName, startLine, endLine,
 				startOffset, endOffset);
-		simpleName.setText(node.getIdentifier());
+
+		if (useOffset) {
+			simpleName.setText(null);
+		} else {
+			simpleName.setText(node.getIdentifier());
+		}
+
 		this.stack.push(simpleName);
 
 		return false;
@@ -635,7 +692,13 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		final ProgramElementInfo expression = new ExpressionInfo(
 				ExpressionInfo.CATEGORY.Character, startLine, endLine,
 				startOffset, endOffset);
-		expression.setText("\'" + node.charValue() + "\'");
+
+		if (useOffset) {
+			expression.setText(null);
+		} else {
+			expression.setText("\'" + node.charValue() + "\'");
+		}
+
 		this.stack.push(expression);
 
 		return false;
@@ -665,7 +728,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		text.append(expression.getText());
 		text.append(".");
 		text.append(name.getText());
-		fieldAccess.setText(text.toString());
+
+		if (useOffset) {
+			fieldAccess.setText(null);
+		} else {
+			fieldAccess.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -714,7 +782,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 				text.append(operandExpression.getText());
 			}
 		}
-		infixExpression.setText(text.toString());
+
+		if (useOffset) {
+			infixExpression.setText(null);
+		} else {
+			infixExpression.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -746,7 +819,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			arrayCreation.addExpression((ProgramElementInfo) initializer);
 			text.append(arrayCreation);
 		}
-		arrayCreation.setText(text.toString());
+
+		if (useOffset) {
+			arrayCreation.setText(null);
+		} else {
+			arrayCreation.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -776,7 +854,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.deleteCharAt(text.length() - 1);
 		}
 		text.append("}");
-		initializer.setText(text.toString());
+
+		if (useOffset) {
+			initializer.setText(null);
+		} else {
+			initializer.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -792,7 +875,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 				ExpressionInfo.CATEGORY.Boolean, startLine, endLine,
 				startOffset, endOffset);
 		this.stack.push(expression);
-		expression.setText(node.toString());
+
+		if (useOffset) {
+			expression.setText(null);
+		} else {
+			expression.setText(node.toString());
+		}
 
 		return false;
 	}
@@ -827,7 +915,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		text.append(operator.getText());
 		text.append(" ");
 		text.append(right.getText());
-		assignment.setText(text.toString());
+
+		if (useOffset) {
+			assignment.setText(null);
+		} else {
+			assignment.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -860,7 +953,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		text.append(type.getText());
 		text.append(")");
 		text.append(expression.getText());
-		cast.setText(text.toString());
+
+		if (useOffset) {
+			cast.setText(null);
+		} else {
+			cast.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -918,7 +1016,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.append(anonymousClass.getText());
 		}
 
-		classInstanceCreation.setText(text.toString());
+		if (useOffset) {
+			classInstanceCreation.setText(null);
+		} else {
+			classInstanceCreation.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -953,7 +1055,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		text.append(thenExpression.getText());
 		text.append(": ");
 		text.append(elseExpression.getText());
-		trinomial.setText(text.toString());
+
+		if (useOffset) {
+			trinomial.setText(null);
+		} else {
+			trinomial.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -994,7 +1101,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		statement.addExpression(invocation);
 		text.append(";");
-		statement.setText(text.toString());
+
+		if (useOffset) {
+			statement.setText(null);
+		} else {
+			statement.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -1022,7 +1134,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			final StringBuilder text = new StringBuilder();
 			text.append(expression.getText());
 			text.append(";");
-			statement.setText(text.toString());
+
+			if (useOffset) {
+				statement.setText(null);
+			} else {
+				statement.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1052,7 +1169,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		text.append(left.getText());
 		text.append(" instanceof ");
 		text.append(right.getText());
-		instanceofExpression.setText(text.toString());
+
+		if (useOffset) {
+			instanceofExpression.setText(null);
+		} else {
+			instanceofExpression.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -1099,7 +1221,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.deleteCharAt(text.length() - 1);
 		}
 		text.append(")");
-		methodInvocation.setText(text.toString());
+
+		if (useOffset) {
+			methodInvocation.setText(null);
+		} else {
+			methodInvocation.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -1124,7 +1251,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		text.append("(");
 		text.append(expression.getText());
 		text.append(")");
-		parenthesizedExpression.setText(text.toString());
+
+		if (useOffset) {
+			parenthesizedExpression.setText(null);
+		} else {
+			parenthesizedExpression.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -1156,7 +1288,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			}
 
 			text.append(";");
-			returnStatement.setText(text.toString());
+
+			if (useOffset) {
+				returnStatement.setText(null);
+			} else {
+				returnStatement.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1209,7 +1346,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		statement.addExpression(superConstructorInvocation);
 		text.append(";");
-		statement.setText(text.toString());
+
+		if (useOffset) {
+			statement.setText(null);
+		} else {
+			statement.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -1225,7 +1367,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 				ExpressionInfo.CATEGORY.This, startLine, endLine, startOffset,
 				endOffset);
 		this.stack.push(expression);
-		expression.setText("this");
+
+		if (useOffset) {
+			expression.setText(null);
+		} else {
+			expression.setText("this");
+		}
 
 		return false;
 	}
@@ -1260,7 +1407,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.append(fragmentExpression.getText());
 		}
 
-		vdExpression.setText(text.toString());
+		if (useOffset) {
+			vdExpression.setText(null);
+		} else {
+			vdExpression.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -1311,7 +1462,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			}
 
 			text.append(";");
-			vdStatement.setText(text.toString());
+
+			if (useOffset) {
+				vdStatement.setText(null);
+			} else {
+				vdStatement.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1345,7 +1501,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.append(expression.getText());
 		}
 
-		vdFragment.setText(text.toString());
+		if (useOffset) {
+			vdFragment.setText(null);
+		} else {
+			vdFragment.setText(text.toString());
+		}
 
 		return false;
 	}
@@ -1420,7 +1580,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.append(expression.getText());
 			text.append(")");
 			text.append(body.getText());
-			foreachBlock.setText(text.toString());
+
+			if (useOffset) {
+				foreachBlock.setText(null);
+			} else {
+				foreachBlock.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1487,7 +1652,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			final StatementInfo body = (StatementInfo) this.stack.pop();
 			forBlock.setStatement(body);
 			text.append(body.getText());
-			forBlock.setText(text.toString());
+
+			if (useOffset) {
+				forBlock.setText(null);
+			} else {
+				forBlock.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1533,7 +1703,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 				text.append(elseBody.getText());
 			}
 
-			ifBlock.setText(text.toString());
+			if (useOffset) {
+				ifBlock.setText(null);
+			} else {
+				ifBlock.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1575,7 +1749,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 				text.append(System.getProperty("line.separator"));
 			}
 
-			switchBlock.setText(text.toString());
+			if (useOffset) {
+				switchBlock.setText(null);
+			} else {
+				switchBlock.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1611,7 +1789,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.append(condition.getText());
 			text.append(") ");
 			text.append(body.getText());
-			synchronizedBlock.setText(text.toString());
+
+			if (useOffset) {
+				synchronizedBlock.setText(null);
+			} else {
+				synchronizedBlock.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1640,7 +1823,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.append("throw ");
 			text.append(expression.getText());
 			text.append(";");
-			throwStatement.setText(text.toString());
+
+			if (useOffset) {
+				throwStatement.setText(null);
+			} else {
+				throwStatement.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1685,7 +1873,11 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 				text.append(finallyBlock.getText());
 			}
 
-			tryBlock.setText(text.toString());
+			if (useOffset) {
+				tryBlock.setText(null);
+			} else {
+				tryBlock.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1721,7 +1913,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.append(condition.getText());
 			text.append(") ");
 			text.append(body.getText());
-			whileBlock.setText(text.toString());
+
+			if (useOffset) {
+				whileBlock.setText(null);
+			} else {
+				whileBlock.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1755,7 +1952,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			}
 
 			text.append(":");
-			switchCase.setText(text.toString());
+
+			if (useOffset) {
+				switchCase.setText(null);
+			} else {
+				switchCase.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1789,7 +1991,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			}
 
 			text.append(";");
-			breakStatement.setText(text.toString());
+
+			if (useOffset) {
+				breakStatement.setText(null);
+			} else {
+				breakStatement.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1823,7 +2030,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			}
 
 			text.append(";");
-			continuekStatement.setText(text.toString());
+
+			if (useOffset) {
+				continuekStatement.setText(null);
+			} else {
+				continuekStatement.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1869,7 +2081,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			}
 
 			text.append("}");
-			simpleBlock.setText(text.toString());
+
+			if (useOffset) {
+				simpleBlock.setText(null);
+			} else {
+				simpleBlock.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1904,7 +2121,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.append(exception.getText());
 			text.append(") ");
 			text.append(catchBlock.getText());
-			catchBlock.setText(text.toString());
+
+			if (useOffset) {
+				catchBlock.setText(null);
+			} else {
+				catchBlock.setText(text.toString());
+			}
 		}
 
 		return false;
@@ -1938,7 +2160,12 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		text.append(type.getText());
 		text.append(" ");
 		text.append(name);
-		variable.setText(text.toString());
+
+		if (useOffset) {
+			variable.setText(null);
+		} else {
+			variable.setText(text.toString());
+		}
 
 		return false;
 	}

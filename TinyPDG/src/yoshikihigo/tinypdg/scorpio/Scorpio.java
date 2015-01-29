@@ -281,7 +281,7 @@ public class Scorpio {
 					final CompilationUnit unit = TinyPDGASTVisitor
 							.createAST(file);
 					final TinyPDGASTVisitor visitor = new TinyPDGASTVisitor(
-							file.getAbsolutePath(), unit, methods);
+							file.getAbsolutePath(), unit, methods, useOffset);
 					unit.accept(visitor);
 				}
 

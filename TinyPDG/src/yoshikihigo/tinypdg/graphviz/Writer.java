@@ -108,7 +108,7 @@ public class Writer {
 				final CompilationUnit unit = TinyPDGASTVisitor.createAST(file);
 				final List<MethodInfo> m = new ArrayList<MethodInfo>();
 				final TinyPDGASTVisitor visitor = new TinyPDGASTVisitor(
-						file.getAbsolutePath(), unit, methods);
+						file.getAbsolutePath(), unit, methods, false);
 				unit.accept(visitor);
 				methods.addAll(m);
 			}

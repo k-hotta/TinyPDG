@@ -57,7 +57,7 @@ abstract public class ProgramElementInfo implements
 	}
 
 	final public void setText(final String text) {
-		assert null != text : "\"text\" is null.";
+		//assert null != text : "\"text\" is null.";
 		this.text = text;
 	}
 
