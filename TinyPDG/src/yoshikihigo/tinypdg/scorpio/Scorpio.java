@@ -16,6 +16,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
+import yoshikihigo.tinypdg.ast.SourceText;
 import yoshikihigo.tinypdg.ast.TinyPDGASTVisitor;
 import yoshikihigo.tinypdg.cfg.node.CFGNodeFactory;
 import yoshikihigo.tinypdg.pdg.PDG;
@@ -278,10 +279,17 @@ public class Scorpio {
 					Message.log("\t[" + (++count) + "/" + numOfFiles
 							+ "] building an AST for " + file.getAbsolutePath());
 
-					final CompilationUnit unit = TinyPDGASTVisitor
-							.createAST(file);
+					final String sourceText = TinyPDGASTVisitor.getSource(file);
+//					final CompilationUnit unit = TinyPDGASTVisitor
+//							.createAST(file);
+					final CompilationUnit unit = TinyPDGASTVisitor.createAST(sourceText);
 					final TinyPDGASTVisitor visitor = new TinyPDGASTVisitor(
 							file.getAbsolutePath(), unit, methods, useOffset);
+					
+					if (useOffset) {
+						visitor.setSourceText(new SourceText(sourceText));
+					}
+					
 					unit.accept(visitor);
 				}
 
