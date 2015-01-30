@@ -86,9 +86,11 @@ import yoshikihigo.tinypdg.pe.VariableInfo;
 public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 	static public CompilationUnit createAST(final File file) {
-
 		final String sourceText = getSource(file);
-
+		return createAST(sourceText);
+	}
+	
+	static public CompilationUnit createAST(final String sourceText) {
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
 		parser.setSource(sourceText.toCharArray());
 		return (CompilationUnit) parser.createAST(null);
