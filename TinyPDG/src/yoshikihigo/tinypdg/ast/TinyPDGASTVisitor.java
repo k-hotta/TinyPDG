@@ -87,6 +87,14 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 	static public CompilationUnit createAST(final File file) {
 
+		final String sourceText = getSource(file);
+
+		final ASTParser parser = ASTParser.newParser(AST.JLS4);
+		parser.setSource(sourceText.toCharArray());
+		return (CompilationUnit) parser.createAST(null);
+	}
+	
+	static public String getSource(final File file) {
 		final String lineSeparator = System.getProperty("line.separator");
 		final StringBuffer text = new StringBuffer();
 		final BufferedReader reader;
@@ -108,10 +116,8 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		final ASTParser parser = ASTParser.newParser(AST.JLS4);
-		parser.setSource(text.toString().toCharArray());
-		return (CompilationUnit) parser.createAST(null);
+		
+		return text.toString();
 	}
 
 	final private String path;
