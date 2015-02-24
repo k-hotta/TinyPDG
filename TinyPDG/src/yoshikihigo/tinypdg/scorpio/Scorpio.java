@@ -16,7 +16,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-import yoshikihigo.tinypdg.ast.SourceText;
 import yoshikihigo.tinypdg.ast.TinyPDGASTVisitor;
 import yoshikihigo.tinypdg.cfg.node.CFGNodeFactory;
 import yoshikihigo.tinypdg.pdg.PDG;
@@ -86,14 +85,6 @@ public class Scorpio {
 				cross.setArgName("on or off");
 				cross.setRequired(false);
 				options.addOption(cross);
-			}
-
-			{
-				final Option offset = new Option("offset", "offset", true,
-						"whether using offset of texts");
-				offset.setArgName("on or off");
-				offset.setRequired(false);
-				options.addOption(offset);
 			}
 
 			{
@@ -220,18 +211,6 @@ public class Scorpio {
 				}
 			}
 
-			boolean useOffset = false;
-			if (cmd.hasOption("offset")) {
-				if (cmd.getOptionValue("offset").equals("on")) {
-					useOffset = true;
-				} else if (cmd.getOptionValue("offset").equals("off")) {
-					useOffset = false;
-				} else {
-					System.err
-							.println("option of \"-offset\" must be \"on\" or \"off\"");
-				}
-			}
-
 			// default verbose level is "off"
 			if (cmd.hasOption("v")) {
 				if (cmd.getOptionValue("v").equals("on")) {
@@ -279,17 +258,10 @@ public class Scorpio {
 					Message.log("\t[" + (++count) + "/" + numOfFiles
 							+ "] building an AST for " + file.getAbsolutePath());
 
-					final String sourceText = TinyPDGASTVisitor.getSource(file);
-//					final CompilationUnit unit = TinyPDGASTVisitor
-//							.createAST(file);
-					final CompilationUnit unit = TinyPDGASTVisitor.createAST(sourceText);
+					final CompilationUnit unit = TinyPDGASTVisitor
+							.createAST(file);
 					final TinyPDGASTVisitor visitor = new TinyPDGASTVisitor(
-							file.getAbsolutePath(), unit, methods, useOffset);
-					
-					if (useOffset) {
-						visitor.setSourceText(new SourceText(sourceText));
-					}
-					
+							file.getAbsolutePath(), unit, methods);
 					unit.accept(visitor);
 				}
 

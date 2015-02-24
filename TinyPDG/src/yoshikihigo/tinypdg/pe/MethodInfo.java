@@ -15,10 +15,9 @@ public class MethodInfo extends ProgramElementInfo implements BlockInfo {
 	final private List<StatementInfo> statements;
 
 	public MethodInfo(final String path, final String name,
-			final int startLine, final int endLine, final int startOffset,
-			final int endOffset) {
+			final int startLine, final int endLine) {
 
-		super(startLine, endLine, startOffset, endOffset);
+		super(startLine, endLine);
 
 		this.path = path;
 		this.name = name;

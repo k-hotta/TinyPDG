@@ -7,9 +7,8 @@ public class VariableInfo extends ProgramElementInfo {
 	final public String name;
 
 	public VariableInfo(final CATEGORY category, final TypeInfo type,
-			final String name, final int startLine, final int endLine,
-			final int startOffset, final int endOffset) {
-		super(startLine, endLine, startOffset, endOffset);
+			final String name, final int startLine, final int endLine) {
+		super(startLine, endLine);
 		this.category = category;
 		this.type = type;
 		this.name = name;

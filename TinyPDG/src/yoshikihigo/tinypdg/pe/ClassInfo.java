@@ -10,8 +10,8 @@ public class ClassInfo extends ProgramElementInfo {
 	final private List<MethodInfo> methods;
 
 	public ClassInfo(final String path, final String name, final int startLine,
-			final int endLine, final int startOffset, final int endOffset) {
-		super(startLine, endLine, startOffset, endOffset);
+			final int endLine) {
+		super(startLine, endLine);
 		assert null != path : "\"path\" is null";
 		this.path = path;
 		this.name = name;

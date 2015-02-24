@@ -7,7 +7,7 @@ public class CFGPseudoNode extends CFGNode<PseudoElement> {
 
 	public static class PseudoElement extends ProgramElementInfo {
 		PseudoElement() {
-			super(0, 0, 0, 0);
+			super(0, 0);
 		}
 	}
 
