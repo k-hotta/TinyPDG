@@ -20,15 +20,23 @@ abstract public class ProgramElementInfo implements
 
 	protected BlockInfo ownerConditionalBlock;
 
+	protected CompilationUnitInfo root;
+
+	protected int startOffset;
+	protected int endOffset;
+
 	public ProgramElementInfo(final int startLine, final int endLine) {
 		this.startLine = startLine;
 		this.endLine = endLine;
 		this.id = ID_GENERATOR.getAndIncrement();
-		this.text = "";
+		this.text = null;
 
 		this.modifiers = new ArrayList<String>();
 
 		this.ownerConditionalBlock = null;
+		this.root = null;
+		this.startOffset = -1;
+		this.endOffset = -1;
 	}
 
 	@Override
@@ -48,7 +56,16 @@ abstract public class ProgramElementInfo implements
 	}
 
 	final public String getText() {
-		return this.text;
+		if (text != null) {
+			return this.text;
+		}
+		
+		if (root == null || startOffset == -1 || endOffset == -1) {
+			// the text of this block is actually empty
+			return "";
+		}
+		
+		return root.getText().substring(startOffset, endOffset + 1);
 	}
 
 	final public void setText(final String text) {
@@ -95,4 +112,29 @@ abstract public class ProgramElementInfo implements
 	public BlockInfo getOwnerConditionalBlock() {
 		return this.ownerConditionalBlock;
 	}
+
+	public final CompilationUnitInfo getRoot() {
+		return root;
+	}
+
+	public final void setRoot(CompilationUnitInfo root) {
+		this.root = root;
+	}
+
+	public final int getStartOffset() {
+		return startOffset;
+	}
+
+	public final void setStartOffset(int startOffset) {
+		this.startOffset = startOffset;
+	}
+
+	public final int getEndOffset() {
+		return endOffset;
+	}
+
+	public final void setEndOffset(int endOffset) {
+		this.endOffset = endOffset;
+	}
+
 }
