@@ -14,8 +14,10 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
+import yoshikihigo.tinypdg.ast.MyTinyPDGASTVisitor;
 import yoshikihigo.tinypdg.ast.TinyPDGASTVisitor;
 import yoshikihigo.tinypdg.cfg.node.CFGNodeFactory;
 import yoshikihigo.tinypdg.pdg.PDG;
@@ -85,6 +87,14 @@ public class Scorpio {
 				cross.setArgName("on or off");
 				cross.setRequired(false);
 				options.addOption(cross);
+			}
+
+			{
+				final Option lowmem = new Option("lowmem", "low-memory-mode",
+						true, "whether to run on the low memory mode");
+				lowmem.setArgName("on or off");
+				lowmem.setRequired(false);
+				options.addOption(lowmem);
 			}
 
 			{
@@ -211,6 +221,18 @@ public class Scorpio {
 				}
 			}
 
+			boolean lowMemoryMode = false;
+			if (cmd.hasOption("lowmem")) {
+				if (cmd.getOptionValue("lowmem").equals("on")) {
+					lowMemoryMode = true;
+				} else if (cmd.getOptionValue("lowmem").equals("off")) {
+					lowMemoryMode = false;
+				} else {
+					System.err
+							.println("option of \"-lowmem\" must be \"on\" or \"off\".");
+				}
+			}
+
 			// default verbose level is "off"
 			if (cmd.hasOption("v")) {
 				if (cmd.getOptionValue("v").equals("on")) {
@@ -260,10 +282,21 @@ public class Scorpio {
 
 					final CompilationUnit unit = TinyPDGASTVisitor
 							.createAST(file);
-					final TinyPDGASTVisitor visitor = new TinyPDGASTVisitor(
-							file.getAbsolutePath(), unit, methods);
+					final ASTVisitor visitor;
+
+					if (lowMemoryMode) {
+						visitor = new MyTinyPDGASTVisitor(
+								file.getAbsolutePath(), unit, methods);
+					} else {
+						visitor = new TinyPDGASTVisitor(file.getAbsolutePath(),
+								unit, methods);
+					}
+
 					unit.accept(visitor);
 				}
+				
+				long memoryElapsed = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+				System.out.println("MEMORY: " + (memoryElapsed / 1024));
 
 				final SortedSet<PDG> pdgs = Collections
 						.synchronizedSortedSet(new TreeSet<PDG>());
