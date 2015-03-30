@@ -83,7 +83,7 @@ import yoshikihigo.tinypdg.pe.StatementInfo;
 import yoshikihigo.tinypdg.pe.TypeInfo;
 import yoshikihigo.tinypdg.pe.VariableInfo;
 
-public class MyTinyPDGASTVisitor extends NaiveASTFlattener {
+public class OffsetBasedTinyPDGASTVisitor extends NaiveASTFlattener {
 
 	static public CompilationUnit createAST(final File file) {
 
@@ -121,7 +121,7 @@ public class MyTinyPDGASTVisitor extends NaiveASTFlattener {
 
 	private final CompilationUnitInfo rootInfo;
 
-	public MyTinyPDGASTVisitor(final String path, final CompilationUnit root,
+	public OffsetBasedTinyPDGASTVisitor(final String path, final CompilationUnit root,
 			final List<MethodInfo> methods) {
 		this.path = path;
 		this.root = root;

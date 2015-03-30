@@ -17,7 +17,7 @@ import org.apache.commons.cli.PosixParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-import yoshikihigo.tinypdg.ast.MyTinyPDGASTVisitor;
+import yoshikihigo.tinypdg.ast.OffsetBasedTinyPDGASTVisitor;
 import yoshikihigo.tinypdg.ast.TinyPDGASTVisitor;
 import yoshikihigo.tinypdg.cfg.node.CFGNodeFactory;
 import yoshikihigo.tinypdg.pdg.PDG;
@@ -285,7 +285,7 @@ public class Scorpio {
 					final ASTVisitor visitor;
 
 					if (lowMemoryMode) {
-						visitor = new MyTinyPDGASTVisitor(
+						visitor = new OffsetBasedTinyPDGASTVisitor(
 								file.getAbsolutePath(), unit, methods);
 					} else {
 						visitor = new TinyPDGASTVisitor(file.getAbsolutePath(),
