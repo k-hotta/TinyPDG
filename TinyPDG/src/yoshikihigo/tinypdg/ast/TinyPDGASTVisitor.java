@@ -495,13 +495,24 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 
 		final StringBuilder text = new StringBuilder();
 		text.append("super.");
-		text.append(name);
+		text.append(name.getText());
+		text.append("(");
+		
+		boolean anyArgument = false;
 		for (final Object argument : node.arguments()) {
+			anyArgument = true;
 			((ASTNode) argument).accept(this);
 			final ProgramElementInfo argumentExpression = this.stack.pop();
 			superMethodInvocation.addExpression(argumentExpression);
 			text.append(argumentExpression.getText());
+			text.append(",");
 		}
+		
+		if (anyArgument) {
+			text.deleteCharAt(text.length() - 1);
+		}
+		
+		text.append(")");
 		superMethodInvocation.setText(text.toString());
 
 		return false;
@@ -515,6 +526,9 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 		final ProgramElementInfo expression = new ExpressionInfo(
 				ExpressionInfo.CATEGORY.TypeLiteral, startLine, endLine);
 		this.stack.push(expression);
+		
+		// XXX is this correct?
+		expression.setText(node.toString());
 
 		return false;
 	}
@@ -665,7 +679,8 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			node.getInitializer().accept(this);
 			final ProgramElementInfo initializer = this.stack.pop();
 			arrayCreation.addExpression((ProgramElementInfo) initializer);
-			text.append(arrayCreation);
+			//text.append(arrayCreation);
+			text.append(initializer.getText());
 		}
 		arrayCreation.setText(text.toString());
 
@@ -1239,6 +1254,8 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.append("while (");
 			text.append(condition.getText());
 			text.append(");");
+			
+			doBlock.setText(text.toString());
 		}
 
 		return false;
@@ -1724,7 +1741,9 @@ public class TinyPDGASTVisitor extends NaiveASTFlattener {
 			text.append("catch (");
 			text.append(exception.getText());
 			text.append(") ");
-			text.append(catchBlock.getText());
+			// XXX catchBlock.getText() -> body.getText() ??
+			// text.append(catchBlock.getText());
+			text.append(body.getText());
 			catchBlock.setText(text.toString());
 		}
 
